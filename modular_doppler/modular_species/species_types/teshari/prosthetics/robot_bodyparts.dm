@@ -6,13 +6,17 @@
 #define ROBOTIC_MEDIUM_BURN_MSG "charred"
 #define ROBOTIC_HEAVY_BURN_MSG "smoldering"
 
+#define TESHARI_ANDROID_BODYPARTS_DMI 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+
 //Teshari normal
 
 /obj/item/bodypart/arm/left/robot/android/teshari
 	name = "cybernetic left raptoral forelimb"
 	desc = "A skeletal limb wrapped in pseudomuscles and membranous feathers, with a low-conductivity case."
-	icon = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
-	icon_static = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+	icon = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_static = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_greyscale = TESHARI_ANDROID_BODYPARTS_DMI
+	should_draw_greyscale = TRUE
 	bodyshape = parent_type::bodyshape | BODYSHAPE_TESHARI
 
 	unarmed_damage_low = TESHARI_PUNCH_LOW
@@ -22,13 +26,16 @@
 	burn_modifier = TESHARI_BURN_MODIFIER - (1 - parent_type::brute_modifier)
 
 	limb_id = "teshari"
+	should_draw_greyscale = TRUE
 	icon_state = "teshari_l_arm"
 
 /obj/item/bodypart/arm/right/robot/android/teshari
 	name = "cybernetic right raptoral forelimb"
 	desc = "A skeletal limb wrapped in pseudomuscles and membranous feathers, with a low-conductivity case."
-	icon_static = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
-	icon = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+	icon = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_static = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_greyscale = TESHARI_ANDROID_BODYPARTS_DMI
+	should_draw_greyscale = TRUE
 	bodyshape = parent_type::bodyshape | BODYSHAPE_TESHARI
 
 	unarmed_damage_low = TESHARI_PUNCH_LOW
@@ -43,8 +50,10 @@
 /obj/item/bodypart/leg/left/robot/android/teshari
 	name = "cybernetic left raptoral hindlimb"
 	desc = "A skeletal limb wrapped in pseudomuscles and membranous feathers, with a low-conductivity case."
-	icon_static = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
-	icon = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+	icon = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_static = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_greyscale = TESHARI_ANDROID_BODYPARTS_DMI
+	should_draw_greyscale = TRUE
 	bodyshape = parent_type::bodyshape | BODYSHAPE_TESHARI
 
 	unarmed_damage_low = TESHARI_PUNCH_LOW
@@ -60,8 +69,10 @@
 /obj/item/bodypart/leg/right/robot/android/teshari
 	name = "cybernetic right raptoral hindlimb"
 	desc = "A skeletal limb wrapped in pseudomuscles and membranous feathers, with a low-conductivity case."
-	icon_static =  'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
-	icon = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+	icon = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_static = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_greyscale = TESHARI_ANDROID_BODYPARTS_DMI
+	should_draw_greyscale = TRUE
 	bodyshape = parent_type::bodyshape | BODYSHAPE_TESHARI
 
 	unarmed_damage_low = TESHARI_PUNCH_LOW
@@ -77,8 +88,10 @@
 /obj/item/bodypart/chest/robot/android/teshari
 	name = "cybernetic raptoral torso"
 	desc = "A heavily reinforced case containing cyborg logic boards, with space for a standard power cell, covered in a layer of membranous feathers."
-	icon_static =  'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
-	icon = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+	icon = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_static = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_greyscale = TESHARI_ANDROID_BODYPARTS_DMI
+	should_draw_greyscale = TRUE
 	bodyshape = parent_type::bodyshape | BODYSHAPE_TESHARI
 
 	brute_modifier = TESHARI_BRUTE_MODIFIER - (1 - parent_type::brute_modifier)
@@ -92,9 +105,12 @@
 /obj/item/bodypart/head/robot/android/teshari
 	name = "cybernetic raptoral head"
 	desc = "A standard reinforced braincase, with spine-plugged neural socket and sensor gimbals. A layer of membranous feathers covers the stark metal."
-	icon_static = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
-	icon = 'modular_doppler/modular_species/species_types/teshari/icons/augments_teshari.dmi'
+	icon = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_static = TESHARI_ANDROID_BODYPARTS_DMI
+	icon_greyscale = TESHARI_ANDROID_BODYPARTS_DMI
+	should_draw_greyscale = TRUE
 	bodyshape = parent_type::bodyshape | BODYSHAPE_TESHARI
+	eyes_icon = 'modular_doppler/modular_species/species_types/teshari/icons/teshari_eyes.dmi'
 
 	unarmed_damage_low = TESHARI_PUNCH_LOW
 	unarmed_damage_high = TESHARI_PUNCH_HIGH
