@@ -5,21 +5,22 @@
 
 /datum/power/psyker_power/scrying_forced
 	name = "Forced Scrying"
-	desc = "Using a sample of a creature's blood, you can estimate your distance from that creature. While you still cannot track creatures without a complex mind, \
-	this violent pulse of psychic energy will reap results even from those shielded against scrying at risk of psychic backlash. Forced scrying is extremely noticeable \
-	to anyone around you and also to the creature you are forcing a scry towards. Costs a moderate amount of stress each time it is used. Forcing through anti-magic or \
-	anti-scrying measures will backlash towards you with even more stress."
+	desc = "For a moderate stress cost, allows you to forcibly estimate your distance from a creature regardless of whether they are immune to scrying or not. \
+	Watch out for backlash!"
 	security_record_text = "Subject can psychically estimate people's distances from themselves using blood samples."
 	value = 3
 	magic_flags = POWER_MAGIC_STANDARD | POWER_MAGIC_MENTAL | POWER_MAGIC_SCRYING
 	action_path = /datum/action/cooldown/power/psyker/scrying_forced
 	required_powers = list(/datum/power/psyker_power/scrying)
+	required_allow_subtypes = FALSE
 
 /datum/action/cooldown/power/psyker/scrying_forced
 	name = "Forced Scrying"
 	desc = "Using a sample of a creature's blood, you can estimate your distance from them remotely."
 	button_icon = 'icons/mob/actions/actions_animal.dmi'
 	button_icon_state = "gaze"
+	use_time = 1 SECONDS
+	cooldown_time = 5 SECONDS
 	click_to_activate = TRUE
 	target_range = 1
 
@@ -40,36 +41,42 @@
 		to_chat(user, span_warning("No mind to link to."))
 		return FALSE
 
-	//bounce off of antimagic with negative effects
+	//bounce off of antimagic with negative effects, but antimagic'd folk can't tell they're being scried at
 	if(!can_affect_scrying(chosen_target))
-		to_chat(user, span_warning("Your sight strains against the mind you seek!"))
-		//double cost. maybe more?
-		modify_stress(PSYKER_STRESS_MODERATE)
-
+		to_chat(user, span_danger("Your scrying backlashes at you!"))
+		StartCooldownSelf(10 SECONDS)
+		playsound(user, 'sound/effects/magic/blind.ogg', 25, TRUE, SILENCED_SOUND_EXTRARANGE)
+		modify_stress(PSYKER_STRESS_MAJOR)	//be careful!!!
+	else
+		to_chat(chosen_target, span_warning("A cold wind rushes through your mind; something is looking for you!"))
 	scry_target = chosen_target
 
-	var/turf/here = get_turf(src)
+	var/turf/here = get_turf(user)
 	var/turf/there = get_turf(scry_target)
 
 	//try to see if we're in a stack-adjacent Z-level. if this returns anything UP or DOWN, we're close!
 	var/combined_dir = get_dir_multiz(here, there)
-	if(combined_dir == NONE)
+	if(combined_dir == NONE && here.z != there.z)
 		to_chat(user, span_warning("You can feel that your target is nowhere near at all..."))
 		modify_stress(PSYKER_STRESS_MINOR)
 	else
 		var/dist_str = ""
 		var/dir_str_v = ""
 		var/dir_str_h = ""
+		var/punct = "."
 
-		var/turf/here_z_amended = get_step_multiz(src, combined_dir)
+		var/turf/here_z_amended = get_step_multiz(user, combined_dir)
 		var/dist_amended = get_dist_euclidean(here_z_amended,there)
 
 		if(dist_amended < 1)
 			dist_str = " jarringly close"
+			punct = "!"
 		else if(dist_amended < 3)
 			dist_str = " very close"
+			punct = "!"
 		else if(dist_amended < 8)
 			dist_str = " close"
+			punct = "!"
 		else if(dist_amended < 32)
 			dist_str = " somewhere"
 		else if(dist_amended < 64)
@@ -92,14 +99,15 @@
 			if(NORTHWEST) dir_str_h = " to the northwest"
 			if(SOUTHEAST) dir_str_h = " to the southeast"
 			if(SOUTHWEST) dir_str_h = " to the southwest"
-			else          dir_str_h = "" //
+			else          dir_str_h = ""
 
-
-		to_chat(user, span_warning("You can feel your target is[dist_str][dir_str_v][dir_str_h].]"))
+		user.visible_message(span_notice("[user] thrums with resonance, %PRONOUN_Their eyes flashing for a moment."), span_danger("Your body thrums with resonance; your eyesight blurs and contorts, and then it is over."))
+		user.adjust_eye_blur_up_to(4 SECONDS, 6 SECONDS)
+		to_chat(user, span_warning("You can feel your target is[dist_str][dir_str_v][dir_str_h][punct]"))
 		modify_stress(PSYKER_STRESS_MODERATE)
 
 
-	playsound(user, 'sound/effects/magic/swap.ogg', 75, TRUE, SILENCED_SOUND_EXTRARANGE)
+	playsound(user, SFX_PORTAL_CREATED, 50, TRUE, SHORT_RANGE_SOUND_EXTRARANGE)
 
 
 //procs lifted from scrying.dm
