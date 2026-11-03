@@ -7649,6 +7649,7 @@
 #include "modular_doppler\modular_powers\code\powers\resonant\psyker\mirage.dm"
 #include "modular_doppler\modular_powers\code\powers\resonant\psyker\premonition.dm"
 #include "modular_doppler\modular_powers\code\powers\resonant\psyker\scrying.dm"
+#include "modular_doppler\modular_powers\code\powers\resonant\psyker\scrying_forced.dm"
 #include "modular_doppler\modular_powers\code\powers\resonant\psyker\stimulant_boost.dm"
 #include "modular_doppler\modular_powers\code\powers\resonant\psyker\telekinesis.dm"
 #include "modular_doppler\modular_powers\code\powers\resonant\psyker\telekinetic_punt.dm"
