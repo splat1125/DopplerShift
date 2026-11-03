@@ -23,6 +23,8 @@
 	click_to_activate = TRUE
 	target_range = 1
 
+	var/atom/movable/scry_target
+
 //mostly lifted from scrying.dm because this power is derivative
 
 /datum/action/cooldown/power/psyker/scrying_forced/use_action(mob/living/user, atom/target)
@@ -100,7 +102,7 @@
 	playsound(user, 'sound/effects/magic/swap.ogg', 75, TRUE, SILENCED_SOUND_EXTRARANGE)
 
 
-
+//procs lifted from scrying.dm
 
 ///	 Checks the blood for a dna match.
 /datum/action/cooldown/power/psyker/scrying_forced/proc/find_scry_target_from_dna(selected_dna)
@@ -114,3 +116,41 @@
 		if(blood_dna && blood_dna[selected_dna])
 			return target
 	return null
+
+/datum/action/cooldown/power/psyker/scrying_forced/proc/get_blood_dna_list_from_target(atom/target)
+	if(isnull(target))
+		return null
+
+	var/list/dna_list = list()
+
+	if(ismob(target))
+		return dna_list
+
+	// Gets dna from a blood decal.
+	if(istype(target, /obj/effect/decal/cleanable/blood))
+		var/list/blood = GET_ATOM_BLOOD_DNA(target)
+		for(var/dna in blood)
+			dna_list += dna
+		return dna_list
+
+	// Gets dna from blood from reagent containers. Note: There's a bug with scraping blood not saving DNA; so if it acts weirds its likely that (as of 20/02/26)
+	if(istype(target, /obj/item/reagent_containers))
+		for(var/datum/reagent/present_reagent as anything in target.reagents?.reagent_list)
+			if(!istype(present_reagent, /datum/reagent/blood))
+				continue
+			var/blood_dna = present_reagent.data?["blood_DNA"]
+			if(isnull(blood_dna))
+				continue
+			if(islist(blood_dna))
+				for(var/dna in blood_dna)
+					dna_list += dna
+			else
+				dna_list += blood_dna
+
+	// Any non-mob atom with forensics blood on it (e.g. clothes, tools)
+	var/list/blood = GET_ATOM_BLOOD_DNA(target)
+	if(length(blood))
+		for(var/dna in blood)
+			dna_list += dna
+
+	return dna_list
