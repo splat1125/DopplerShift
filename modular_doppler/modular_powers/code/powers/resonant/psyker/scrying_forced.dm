@@ -26,7 +26,7 @@
 
 	var/atom/movable/scry_target
 
-//mostly lifted from scrying.dm because this power is derivative
+//most of the blood discerning stuff is lifted from scrying.dm because this power is derivative,,,,,,,,
 
 /datum/action/cooldown/power/psyker/scrying_forced/use_action(mob/living/user, atom/target)
 	var/list/dna_samples = get_blood_dna_list_from_target(target)
@@ -43,7 +43,7 @@
 
 	//bounce off of antimagic with negative effects, but antimagic'd folk can't tell they're being scried at
 	if(!can_affect_scrying(chosen_target))
-		to_chat(user, span_danger("Your scrying backlashes at you!"))
+		to_chat(user, span_userdanger("Your scrying backlashes at you!"))
 		StartCooldownSelf(10 SECONDS)
 		playsound(user, 'sound/effects/magic/blind.ogg', 25, TRUE, SILENCED_SOUND_EXTRARANGE)
 		modify_stress(PSYKER_STRESS_MAJOR)	//be careful!!!
@@ -103,6 +103,7 @@
 
 		user.visible_message(span_notice("[user] thrums with resonance, %PRONOUN_Their eyes flashing for a moment."), span_danger("Your body thrums with resonance; your eyesight blurs and contorts, and then it is over."))
 		user.adjust_eye_blur_up_to(4 SECONDS, 6 SECONDS)
+		user.adjust_temp_blindness_up_to(2 SECONDS, 3 SECONDS)
 		to_chat(user, span_warning("You can feel your target is[dist_str][dir_str_v][dir_str_h][punct]"))
 		modify_stress(PSYKER_STRESS_MODERATE)
 
