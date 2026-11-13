@@ -6,7 +6,7 @@
 /datum/power/psyker_power/scrying_forced
 	name = "Forced Scrying"
 	desc = "For a moderate stress cost, allows you to forcibly estimate your distance from a creature regardless of whether they are immune to scrying or not. \
-	Watch out for backlash!"
+	Watch out for backlash; scrying-immune subjects will stun you!"
 	security_record_text = "Subject can psychically estimate people's distances from themselves using blood samples."
 	value = 3
 	magic_flags = POWER_MAGIC_STANDARD | POWER_MAGIC_MENTAL | POWER_MAGIC_SCRYING
@@ -41,13 +41,21 @@
 		to_chat(user, span_warning("No mind to link to."))
 		return FALSE
 
-	//bounce off of antimagic with negative effects, but antimagic'd folk can't tell they're being scried at
+	//bounce off of antimagic with negative effects
 	if(!can_affect_scrying(chosen_target))
-		to_chat(user, span_userdanger("Your scrying backlashes at you!"))
-		StartCooldownSelf(10 SECONDS)
+		to_chat(user, span_userdanger("Your scrying backlashes off of your target!"))
+		StartCooldownSelf(20 SECONDS)
 		playsound(user, 'sound/effects/magic/blind.ogg', 25, TRUE, SILENCED_SOUND_EXTRARANGE)
-		modify_stress(PSYKER_STRESS_MAJOR)	//be careful!!!
-	else
+		modify_stress(PSYKER_STRESS_MAJOR * 1.5)	//be careful!
+
+		//scrying someone immune always causes a mild event regardless of your cooldowns
+		pick_psyker_event(/datum/psyker_event/mild, user)
+		user.Stun(3 SECONDS)
+
+		if(rand() < 0.25)	//25% chance to warn shielded
+			to_chat(chosen_target, span_warning("A presence menaces at your mind, seeking you out!"))
+
+	else if(rand() < 0.05)	//5% chance to warn
 		to_chat(chosen_target, span_warning("A cold wind rushes through your mind; something is looking for you!"))
 	scry_target = chosen_target
 
@@ -101,8 +109,7 @@
 			if(SOUTHWEST) dir_str_h = " to the southwest"
 			else          dir_str_h = ""
 
-		user.visible_message(span_notice("[user] thrums with resonance, %PRONOUN_Their eyes flashing for a moment."), span_danger("Your body thrums with resonance; your eyesight blurs and contorts, and then it is over."))
-		user.adjust_eye_blur_up_to(4 SECONDS, 6 SECONDS)
+		user.adjust_eye_blur_up_to(3 SECONDS, 4 SECONDS)
 		user.adjust_temp_blindness_up_to(2 SECONDS, 3 SECONDS)
 		to_chat(user, span_warning("You can feel your target is[dist_str][dir_str_v][dir_str_h][punct]"))
 		modify_stress(PSYKER_STRESS_MODERATE)
@@ -111,8 +118,46 @@
 	playsound(user, SFX_PORTAL_CREATED, 50, TRUE, SHORT_RANGE_SOUND_EXTRARANGE)
 
 
-//procs lifted from scrying.dm
 
+/// Picks the backlash event after a stress breakdown
+/datum/action/cooldown/power/psyker/scrying_forced/proc/pick_psyker_event(base_type, mob/living/carbon/human/human)
+	var/list/candidates = list()
+
+	// We check for abstract types and assign the weights
+	for(var/subtype in subtypesof(base_type))
+		var/datum/psyker_event/event_type = subtype
+
+		if(initial(event_type.abstract_type) == subtype)
+			continue
+
+		var/weight = initial(event_type.weight)
+		candidates[subtype] = weight
+
+	// We check the candidates, pick one, try it. If it returns true, we end. If it returns false, we try another.
+	// In principle this should never fail because each category has one that will always return true.
+	while(length(candidates))
+		var/subtype = pick_weight(candidates)
+		candidates -= subtype
+
+		var/datum/psyker_event/event = new subtype
+
+		if(!event.can_execute(human, src))
+			qdel(event)
+			continue
+
+		// We check if it actually successfully executed. Qdel it under normal circumstances; if it lingers we don't.
+		if(event.execute(human))
+			if(!event.lingering)
+				qdel(event)
+			return
+
+		// Execution failed? We retry
+		qdel(event)
+
+	return
+
+
+//procs lifted from scrying.dm
 ///	 Checks the blood for a dna match.
 /datum/action/cooldown/power/psyker/scrying_forced/proc/find_scry_target_from_dna(selected_dna)
 	if(!selected_dna)
